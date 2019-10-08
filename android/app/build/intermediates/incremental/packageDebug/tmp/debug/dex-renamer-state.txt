@@ -1,0 +1,4 @@
+#Mon Sep 23 20:41:57 EET 2019
+base.0=/home/mm/Desktop/mobile_mmControl/android/app/build/intermediates/transforms/dexMerger/debug/0
+renamed.0=classes.dex
+path.0=classes.dex
