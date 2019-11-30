@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "/home/mm/Desktop/mobile_mmControl/android/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-es/values-es.xml",
+            "outputFile": "/home/mm/Desktop/mmControlReactNative/android/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-es/values-es.xml",
             "map": [
                 {
                     "source": "/root/.gradle/caches/transforms-2/files-2.1/b32e81201d0e61c846930f42d9b13500/res/values-es/values-es.xml",

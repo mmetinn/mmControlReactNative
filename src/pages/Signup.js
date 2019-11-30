@@ -13,14 +13,8 @@ import {
 } from 'react-native';
 
 import Logo from '../components/Logo';
-import { Field, reduxForm } from 'redux-form';
-import InputText from '../components/InputText';
 import Loader from '../components/Loader';
-import RadioForm, { RadioButton, RadioButtonInput, RadioButtonLabel } from 'react-native-simple-radio-button';
 import { Actions } from 'react-native-router-flux';
-import { connect } from 'react-redux';
-import { compose } from "redux";
-import { createNewUser } from '../actions/auth.actions';
 
 class Signup extends Component {
 
@@ -32,24 +26,7 @@ class Signup extends Component {
             language: '',
         }
     }
-    renderTextInput = (field) => {
-        const { meta: { touched, error }, label, secureTextEntry, maxLength, keyboardType, placeholder, input: { onChange, ...restInput } } = field;
-        return (
-            <View>
-                <InputText
-                    onChangeText={onChange}
-                    maxLength={maxLength}
-                    placeholder={placeholder}
-                    keyboardType={keyboardType}
-                    secureTextEntry={secureTextEntry}
-                    label={label}
-                    {...restInput} />
-                {(touched && error) && <Text style={styles.errorText}>{error}</Text>}
-            </View>
-        );
-    }
-
-
+    
 
     changeSelected = () => {
         this.setState({
@@ -66,36 +43,16 @@ class Signup extends Component {
         }
     }
 
-    createNewUser = async (values) => {
-        try {
-            const response = await this.props.dispatch(createNewUser(values));
-            if (!response.success) {
-                throw response;
-            }
-        } catch (error) {
-            const newError = new ErrorUtils(error, "Signup Error");
-            newError.showAlert();
-        }
-    }
-
-    onSubmit = (values) => {
-        this.createNewUser(values);
-    }
+    
     goBack() {
         Actions.Login();
     }
 
     render() {
-        const radio_props = [
-            { label: 'Erkek  ', value: 0 },
-            { label: 'Kadın  ', value: 1 }
-        ];
-        const { handleSubmit, createUser } = this.props;
         return (
             <ScrollView>
 
                 <View style={styles.container}>
-                    {createUser.isLoading && <Loader />}
                     <Logo />
                     <View style={styles.viewBox} >
                         <TouchableOpacity style={this.state.selected ? styles.btnSelected : styles.btnNotSelected} onPress={this.changeSelected} >
@@ -107,90 +64,8 @@ class Signup extends Component {
                                 Hasta</Text>
                         </TouchableOpacity>
                     </View>
-                    <Text>{this.state.infoSelected}</Text>
-                    <Field
-                        name="adi"
-                        placeholder="Ad *"
-                        component={this.renderTextInput} />
-                    <Field
-                        name="soyadi"
-                        placeholder="Soyad *"
-                        component={this.renderTextInput} />
-                    <Field
-                        name="parola"
-                        placeholder="Parola *"
-                        secureTextEntry={true}
-                        component={this.renderTextInput} />
-                    <Field
-                        name="parolaTekrar"
-                        placeholder="Parola Tekrar *"
-                        secureTextEntry={true}
-                        component={this.renderTextInput} />
-                    <Field
-                        name="email"
-                        placeholder="Email *"
-                        component={this.renderTextInput} />
-                    <Field
-                        name="telefon"
-                        placeholder="Telefon Numarası *"
-                        component={this.renderTextInput} />
-
-                    <Field
-                        initial={0}
-                        onPress={(value) => { this.setState({ value: value }) }}
-                        formHorizontal={true}
-                        style={styles.radioFrom} name="sex"
-                        component={RadioForm} radio_props={radio_props}
-                        type="radio" value="male"
-                        name={this.state.value} />
-
-                    <Field
-                        component={Picker}
-                        selectedValue={this.state.language}
-                        style={styles.picker}
-                        onValueChange={(itemValue, itemIndex) =>
-                            this.setState({ language: itemValue })
-                        }>
-                        <Field
-                            name="guvenlik_cevabi_select_ask"
-                            label="Lütfen güvenlik sorunuzu seçiniz?"
-                            component={Picker.Item}
-                            selectedButtonColor={'#fff554'}
-                            value="dateBirtday"
-                            selected disabled
-                        />
-                        <Field
-                            name="guvenlik_cevabi_birtday"
-                            label="Doğum tarihiniz nedir?"
-                            component={Picker.Item}
-                            selectedButtonColor={'#fff554'}
-                            value="dateBirtday"
-                        />
-                        <Field
-                            name="guvenlik_cevabi_teacher"
-                            label="En sevdiğiniz öğretmenin adı nedir?"
-                            component={Picker.Item}
-                            selectedButtonColor={'#fff554'}
-                            value="betterTeacher"
-                        />
-                        <Field
-                            name="guvenlik_cevabi_pet"
-                            label="En sevdiğiniz evcil hayvanın adı nedir?"
-                            component={Picker.Item}
-                            selectedButtonColor={'#fff554'}
-                            value="betterPet"
-                        />
-                    </Field>
-
-                    <Field
-                        name="guvenlik_cevabi"
-                        placeholder="Güvenlik Sorusunun Cevabı *"
-                        label={this.state.language}
-                        component={this.renderTextInput}
-                        selectedButtonColor={'#fff554'}
-                    />
-
-                    <TouchableOpacity style={styles.button} onPress={handleSubmit(this.onSubmit)}>
+                    <Text>{this.state.infoSelected}</Text>                   
+                    <TouchableOpacity style={styles.button} >
                         <Text style={styles.buttonText}>Signup</Text>
                     </TouchableOpacity>
                     <View style={styles.signupTextCont}>
@@ -204,52 +79,8 @@ class Signup extends Component {
     }
 }
 
-const validate = (values) => {
-    const errors = {};
-    console.log("values:::" + JSON.stringify(values));
 
-    if (!values.name) {
-        errors.name = "Ad Girilmedi";
-    }
-    if (!values.surname) {
-        errors.surname = "Soyad Girilmedi";
-    }
-    if (!values.password) {
-        errors.password = "Şifre Girilmedi";
-    }
-    if (!values.passwordAgain) {
-        errors.passwordAgain = "Şifre Tekrar Girilmedi";
-    }
-    if (!values.email) {
-        errors.email = "Email Girilmedi";
-    }
-    if (!values.phoneNumber) {
-        errors.phoneNumber = "Telefon Girilmedi";
-    }
-    if (!values.securityAsk) {
-        errors.securityAsk = "Güvenlik Sorusu Seçilmedi";
-    }
-    if (!values.securityAnswer) {
-        errors.securityAnswer = "Güvenlik Sorusu Cevaplanmadı";
-    }
-    return errors;
-}
-
-mapStateToProps = (state) => ({
-    createUser: state.authReducer.createUser
-})
-
-mapDispatchToProps = (dispatch) => ({
-    dispatch
-});
-
-export default compose(
-    connect(mapStateToProps, mapDispatchToProps),
-    reduxForm({
-        form: "register",
-        validate
-    })
-)(Signup);
+export default (Signup);
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#fdfdfd',

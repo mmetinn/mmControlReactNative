@@ -13,8 +13,8 @@ class Root extends Component {
         return (
             <Router>
                 <Scene key="root" hideNavBar={true}>
-                    <Scene key="Login" component={Login} title="login"  />
-                    <Scene key="Signup" component={Signup} title="signup" initial={true}/>
+                    <Scene key="Login" component={Login} title="login"  initial={true}/>
+                    <Scene key="Signup" component={Signup} title="signup" />
                 </Scene>
             </Router>
         );

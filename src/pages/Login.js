@@ -8,8 +8,9 @@ import {
    Image,
 } from 'react-native'
 import Logo from '../components/Logo'
-import LoginForm from '../components/LoginForm'
 import { Actions } from 'react-native-router-flux'
+import Axios from 'axios'
+import { constants as CONSTS} from '../constants/constants'
 import { connect } from 'react-redux';
 
 class Login extends Component {
@@ -18,12 +19,23 @@ class Login extends Component {
       this.state = {
          food: 'aaa',
          selected: true,
-         infoSelected: 'Doktor Girişi Seçildi'
+         infoSelected: 'Doktor Girişi Seçildi',
+         email: '',
+         password: '',
       }
    }
-
-   login = (email, pass) => {
-      //alert('email: ' + email + ' password: ' + pass)      
+   login = () => {
+      Axios.post(CONSTS.API_IP+''+CONSTS.API_VERSION+'/login',{
+         email:this.state.email,password:this.state.password
+      , whichKind:"patient"})
+         .then(response => {
+            //console.log(response.data);
+         })
+         .catch(error => {
+            console.log(error);
+         });
+         this.props.degistirSinifAd;
+        // alert("as "+this.state.password+" as "+this.state.password);
    }
    openSignup() {
       Actions.Signup();
@@ -42,6 +54,8 @@ class Login extends Component {
             infoSelected: 'Doktor Girişi Seçildi'
          })
       }
+      console.log(this.props);
+
    }
 
 
@@ -56,17 +70,44 @@ class Login extends Component {
                      Doktor</Text>
                </TouchableOpacity>
                <TouchableOpacity style={this.state.selected ? styles.btnNotSelected : styles.btnSelected} onPress={this.changeSelected} >
-                  <Text
-                  >
+                  <Text>
                      Hasta</Text>
                </TouchableOpacity>
             </View>
             <Text>{this.state.infoSelected}</Text>
-            <LoginForm></LoginForm>
+            <View style={styles.container_login}>
+               <View style={{ flexDirection: 'row' }}>
+                  <TextInput
+                     style={styles.inputBox} underlineColorAndroid='rgba(0,0,0,0)'
+                     placeholder='Email'  placeholderTextColor='#333'
+                     selectionColor="#000" keyboardType="email-address"
+                     onChangeText={(email) => this.setState({ email: email })}
+                  />
+               </View>
+               <View style={{ flexDirection: 'row' }}>
+                  <TextInput
+                     style={styles.inputBox} underlineColorAndroid='rgba(0,0,0,0)'
+                     placeholder='Password' placeholderTextColor='#333'
+                     selectionColor="#000" keyboardType="email-address"
+                     secureTextEntry={true}
+                     onChangeText={(password) => this.setState({password : password })}
+
+                  />
+               </View>
+               <View style={{ flexDirection: 'row' }}>
+
+                  <TouchableOpacity style={styles.button}>
+                     <Text onPress={this.login} style={styles.buttonText}>
+                        Login
+                    </Text>
+                  </TouchableOpacity>
+               </View>
+            </View>
+
             <View style={styles.signupTextCont}>
                <Text style={styles.signupText}>Henüz bir hesabın yok mu?</Text>
                <TouchableOpacity onPress={this.openSignup}>
-                  <Text onPress={this.login()} style={styles.signupButton}>Kaydol</Text>
+                  <Text style={styles.signupButton}>Kaydol</Text>
                </TouchableOpacity>
             </View>
          </View>
@@ -75,12 +116,43 @@ class Login extends Component {
 }
 
 
-export default (Login);
+const mapStateToProps = (state, ownProps) => {
+   console.log("state "+JSON.stringify(state));
+   console.log("ownprops "+JSON.stringify(ownProps));
+   
+   
+   return {
+     loginStatus: state.hastaReducer.loginStatus,
+     token: state.hastaReducer.token
+   };
+ };
+ 
+ const mapDispatchToProps = dispatch => {
+   return {
+     degistirSinifAd: () => {
+       dispatch({ type: CONSTS.HASTA_DEGISTIR_AD, payload: { loginStatus:  "loginSTATUS" } });
+     },
+     degistirSinifOgretmen: () => {
+       dispatch({
+         type: CONSTS.HASTA_DEGISTIR_SOYAD,
+         payload: { token: "TOKEN" }
+       });
+     }
+   };
+ };
+ const loginConnected = connect(mapStateToProps, mapDispatchToProps)(Login)
+
+export default loginConnected;
 
 const styles = StyleSheet.create({
    container: {
       backgroundColor: '#fdfdfd',
       flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+   },
+   container_login: {
+      flexGrow: 1,
       justifyContent: 'center',
       alignItems: 'center',
    },
@@ -113,5 +185,31 @@ const styles = StyleSheet.create({
       paddingHorizontal: 20,
       paddingVertical: 16,
 
+   },
+   inputBox: {
+      flex: .8,
+      backgroundColor: 'rgba(255,245,84,.8)',
+      borderRadius: 25,
+      paddingHorizontal: 20,
+      fontSize: 18,
+      color: '#333',
+      margin: 8,
+   },
+   button: {
+      flex: .2,
+      paddingHorizontal: 20,
+      backgroundColor: 'rgba(255,245,84,.8)',
+      //        backgroundColor: '#c79200',
+      //backgroundColor:'rgba(199,146,0,.6)',
+
+      margin: 8,
+      borderRadius: 25,
+      paddingVertical: 16,
+   },
+   buttonText: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: '#000',
+      textAlign: 'center',
    }
 })
