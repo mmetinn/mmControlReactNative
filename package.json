@@ -29,7 +29,9 @@
     "eslint": "6.4.0",
     "jest": "24.9.0",
     "metro-react-native-babel-preset": "0.54.1",
-    "react-test-renderer": "16.8.6"
+    "react-test-renderer": "16.8.6",
+    "redux-devtools-extension": "^2.13.8",
+    "remote-redux-devtools": "^0.5.16"
   },
   "jest": {
     "preset": "react-native"
