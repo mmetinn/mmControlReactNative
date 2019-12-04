@@ -5,37 +5,50 @@ import {
    TouchableOpacity,
    TextInput,
    StyleSheet,
-   Image,
 } from 'react-native'
 import Logo from '../components/Logo'
 import { Actions } from 'react-native-router-flux'
 import Axios from 'axios'
-import { constants as CONSTS} from '../constants/constants'
+import { constants as CONSTS } from '../constants/constants'
 import { connect } from 'react-redux';
 
 class Login extends Component {
    constructor(props) {
       super(props)
       this.state = {
-         food: 'aaa',
          selected: true,
          infoSelected: 'Doktor Girişi Seçildi',
          email: '',
          password: '',
+         loginStatus: '',
+         loggedIn: false,
+         token: '',
       }
    }
    login = () => {
-      Axios.post(CONSTS.API_IP+''+CONSTS.API_VERSION+'/login',{
-         email:this.state.email,password:this.state.password
-      , whichKind:"patient"})
+      Axios.post(CONSTS.API_IP + '' + CONSTS.API_VERSION + '/login', {
+         email: this.state.email, password: this.state.password
+         , whichKind: (this.state.selected?'doctor':'patient')
+      })
          .then(response => {
-            //console.log(response.data);
+            console.log("response.data " + JSON.stringify(response.data));
+            const {
+               status,
+               token
+            } = response.data
+            if(status===true)
+               Actions.Main();
+
+            this.setState({
+               loginStatus: status ? "LOGIN_SUCCESSFUL" : "LOGIN_FAILED",
+               loggedIn: status,
+               token: token
+            })
+            this.props.degistirSinifAd(this.state)
          })
          .catch(error => {
             console.log(error);
          });
-         this.props.degistirSinifAd;
-        // alert("as "+this.state.password+" as "+this.state.password);
    }
    openSignup() {
       Actions.Signup();
@@ -54,7 +67,6 @@ class Login extends Component {
             infoSelected: 'Doktor Girişi Seçildi'
          })
       }
-      console.log(this.props);
 
    }
 
@@ -79,7 +91,7 @@ class Login extends Component {
                <View style={{ flexDirection: 'row' }}>
                   <TextInput
                      style={styles.inputBox} underlineColorAndroid='rgba(0,0,0,0)'
-                     placeholder='Email'  placeholderTextColor='#333'
+                     placeholder='Email' placeholderTextColor='#333'
                      selectionColor="#000" keyboardType="email-address"
                      onChangeText={(email) => this.setState({ email: email })}
                   />
@@ -88,9 +100,9 @@ class Login extends Component {
                   <TextInput
                      style={styles.inputBox} underlineColorAndroid='rgba(0,0,0,0)'
                      placeholder='Password' placeholderTextColor='#333'
-                     selectionColor="#000" keyboardType="email-address"
+                     selectionColor="#000"
                      secureTextEntry={true}
-                     onChangeText={(password) => this.setState({password : password })}
+                     onChangeText={(password) => this.setState({ password: password })}
 
                   />
                </View>
@@ -117,30 +129,37 @@ class Login extends Component {
 
 
 const mapStateToProps = (state, ownProps) => {
-   console.log("state "+JSON.stringify(state));
-   console.log("ownprops "+JSON.stringify(ownProps));
-   
-   
+   console.log("state " + JSON.stringify(state));
+   console.log("ownprops " + JSON.stringify(ownProps));
    return {
-     loginStatus: state.hastaReducer.loginStatus,
-     token: state.hastaReducer.token
+      loginStatus: state.loginReducer.loginStatus,
+      token: state.loginReducer.token,
+      loggedIn: state.loginReducer.loggedIn
    };
- };
- 
- const mapDispatchToProps = dispatch => {
+};
+
+const mapDispatchToProps = dispatch => {
    return {
-     degistirSinifAd: () => {
-       dispatch({ type: CONSTS.HASTA_DEGISTIR_AD, payload: { loginStatus:  "loginSTATUS" } });
-     },
-     degistirSinifOgretmen: () => {
-       dispatch({
-         type: CONSTS.HASTA_DEGISTIR_SOYAD,
-         payload: { token: "TOKEN" }
-       });
-     }
+      degistirSinifAd: (e) => {
+         dispatch({
+            type: CONSTS.LOG_IN, payload: {
+               loginStatus: e.loginStatus,
+               loggedIn: e.loggedIn,
+               token: e.token
+            }
+         });
+      },
+      degistirSinifOgretmen: () => {
+         console.log("degistirSinifOgretmen is working");
+
+         dispatch({
+            type: CONSTS.LOG_OUT,
+            payload: { token: "TOKEN" }
+         });
+      }
    };
- };
- const loginConnected = connect(mapStateToProps, mapDispatchToProps)(Login)
+};
+const loginConnected = connect(mapStateToProps, mapDispatchToProps)(Login)
 
 export default loginConnected;
 
@@ -199,9 +218,6 @@ const styles = StyleSheet.create({
       flex: .2,
       paddingHorizontal: 20,
       backgroundColor: 'rgba(255,245,84,.8)',
-      //        backgroundColor: '#c79200',
-      //backgroundColor:'rgba(199,146,0,.6)',
-
       margin: 8,
       borderRadius: 25,
       paddingVertical: 16,
